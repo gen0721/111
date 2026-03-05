@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Пользователи (и ты как админ)
+model User {
+  id        String   @id @default(cuid())
+  telegramId String  @unique
+  username  String?  // Сюда запишется "anva4ik"
+  balance   Float    @default(0.0) // Баланс в USDT
+  role      String   @default("USER") // USER или ADMIN
+  createdAt DateTime @default(now())
+
+  products  Product[] // Товары, которые он продает
+  orders    Order[]   // Покупки
+}
+
+// Товары
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  isSold      Boolean  @default(false)
+  
+  orders      Order[]
+}
+
+// Сделки (Escrow - Заморозка)
+model Order {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  buyerId   String
+  buyer     User     @relation(fields: [buyerId], references: [id])
+  
+  status    String   @default("HOLD") // HOLD (Заморожено), COMPLETED (Успешно), DISPUTE (Спор), REFUNDED (Возврат)
+  createdAt DateTime @default(now())
+}
+
