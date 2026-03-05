@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // Подключи призму здесь
+import { prisma } from '../../../../lib/prisma'; // Подключи призму здесь
 
 export async function POST(req: Request) {
   const { buyerId, productId } = await req.json();
